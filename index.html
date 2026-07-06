@@ -1,0 +1,573 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Petal — Your AI Life Journal</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🫧</text></svg>" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #fafafa;
+        color: #1a1a1a;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* Hero */
+      .hero {
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 80px 0;
+      }
+      .hero h1 {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+        letter-spacing: -0.02em;
+      }
+      .hero .subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        max-width: 480px;
+        margin-bottom: 40px;
+      }
+      .petal-avatar {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 32px;
+        animation: float 3s ease-in-out infinite;
+        cursor: pointer;
+      }
+      .petal-avatar svg {
+        width: 100%;
+        height: 100%;
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-12px);
+        }
+      }
+      @keyframes breathe {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.04);
+        }
+      }
+      @keyframes blink {
+        0%,
+        97%,
+        100% {
+          transform: scaleY(1);
+        }
+        98%,
+        99% {
+          transform: scaleY(0.1);
+        }
+      }
+      .petal-body {
+        animation: breathe 4s ease-in-out infinite;
+      }
+      .petal-eye-l {
+        animation: blink 4s ease-in-out infinite;
+        transform-origin: 46px 58px;
+      }
+      .petal-eye-r {
+        animation: blink 4s ease-in-out infinite;
+        transform-origin: 74px 58px;
+      }
+
+      /* Form */
+      .signup-form {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+        max-width: 420px;
+      }
+      .signup-form input {
+        flex: 1;
+        padding: 14px 16px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .signup-form input:focus {
+        border-color: #1a1a1a;
+      }
+      .signup-form button {
+        padding: 14px 24px;
+        background: #1a1a1a;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.2s;
+      }
+      .signup-form button:hover {
+        background: #333;
+      }
+      .form-message {
+        margin-top: 12px;
+        font-size: 0.9rem;
+        display: none;
+      }
+      .form-message.success {
+        color: #16a34a;
+        display: block;
+      }
+      .form-message.error {
+        color: #dc2626;
+        display: block;
+      }
+      .trust-note {
+        margin-top: 12px;
+        font-size: 0.85rem;
+        color: #999;
+      }
+
+      /* Sections */
+      section {
+        padding: 80px 0;
+      }
+      .section-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 24px;
+        text-align: center;
+      }
+
+      /* How it works */
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .step {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .step-number {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      .step-content h3 {
+        font-size: 1.1rem;
+        margin-bottom: 4px;
+      }
+      .step-content p {
+        color: #666;
+        font-size: 0.95rem;
+      }
+
+      /* Weekly Review Card */
+      .review-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      .review-card .header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      .petal-avatar-sm {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+      }
+      .petal-avatar-sm svg {
+        width: 100%;
+        height: 100%;
+      }
+      .review-card .header .name {
+        font-weight: 600;
+        color: #666;
+      }
+      .review-card .content {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #333;
+      }
+      .review-card .content em {
+        color: #1a1a1a;
+        font-style: normal;
+        font-weight: 600;
+      }
+
+      /* FAQ */
+      .faq-item {
+        border-bottom: 1px solid #eee;
+        padding: 20px 0;
+      }
+      .faq-item h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+      .faq-item p {
+        color: #666;
+        font-size: 0.95rem;
+      }
+
+      /* CTA */
+      .cta {
+        text-align: center;
+        padding: 80px 0;
+      }
+      .cta h2 {
+        font-size: 2rem;
+        margin-bottom: 32px;
+      }
+
+      /* Footer */
+      footer {
+        text-align: center;
+        padding: 40px 0;
+        color: #999;
+        font-size: 0.85rem;
+      }
+      footer a {
+        color: #666;
+        text-decoration: none;
+      }
+
+      /* Features grid */
+      .features {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .feature {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+      }
+      .feature .icon {
+        font-size: 28px;
+        margin-bottom: 8px;
+      }
+      .feature h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .feature p {
+        color: #666;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 480px) {
+        .hero h1 {
+          font-size: 2rem;
+        }
+        .signup-form {
+          flex-direction: column;
+        }
+        .features {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero">
+      <div class="container">
+        <div class="petal-avatar">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <filter id="blobShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.08" />
+              </filter>
+              <filter id="softEdge">
+                <feGaussianBlur stdDeviation="1.5" result="blur" />
+                <feComponentTransfer in="blur" result="glow">
+                  <feFuncA type="linear" slope="1.8" />
+                </feComponentTransfer>
+                <feMerge>
+                  <feMergeNode in="glow" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <radialGradient id="bodyGrad" cx="40%" cy="35%" r="60%">
+                <stop offset="0%" stop-color="#ffffff" />
+                <stop offset="100%" stop-color="#e8e8e8" />
+              </radialGradient>
+            </defs>
+
+            <g filter="url(#blobShadow)">
+              <!-- Fluffy blob body: overlapping circles for fluffy look -->
+              <g class="petal-body">
+                <!-- Main body -->
+                <circle cx="60" cy="65" r="38" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <!-- Top fluff -->
+                <circle cx="42" cy="40" r="22" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <circle cx="78" cy="40" r="22" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <!-- Side fluff -->
+                <circle cx="30" cy="60" r="18" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <circle cx="90" cy="60" r="18" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <!-- Bottom fluff -->
+                <circle cx="42" cy="88" r="20" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <circle cx="78" cy="88" r="20" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <circle cx="60" cy="95" r="18" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+                <!-- Center overlay to smooth transition -->
+                <circle cx="60" cy="65" r="36" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+              </g>
+
+              <!-- Blush -->
+              <ellipse cx="38" cy="70" rx="8" ry="5" fill="#ffd1dc" opacity="0.5" />
+              <ellipse cx="82" cy="70" rx="8" ry="5" fill="#ffd1dc" opacity="0.5" />
+
+              <!-- Eyes -->
+              <g class="petal-eye-l">
+                <circle cx="46" cy="58" r="5" fill="#2a2a2a" />
+                <circle cx="44" cy="56" r="2" fill="#fff" opacity="0.7" />
+              </g>
+              <g class="petal-eye-r">
+                <circle cx="74" cy="58" r="5" fill="#2a2a2a" />
+                <circle cx="72" cy="56" r="2" fill="#fff" opacity="0.7" />
+              </g>
+
+              <!-- Small mouth -->
+              <path d="M55 74 Q60 79 65 74" stroke="#bbb" stroke-width="1.5" fill="none" stroke-linecap="round" />
+            </g>
+          </svg>
+        </div>
+        <h1>Chat with Petal.<br />That's your journal.</h1>
+        <p class="subtitle">A fluffy AI companion who listens, remembers, and sends you a weekly life review.</p>
+        <form class="signup-form" id="signupForm" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="7d3a043c-a534-4a89-ad6d-d49a0f09c80d" />
+          <input type="hidden" name="subject" value="New Petal waitlist signup" />
+          <input type="email" name="email" placeholder="Your email" required />
+          <button type="submit">Get Early Access</button>
+        </form>
+        <p class="trust-note">No spam. Unsubscribe anytime.</p>
+        <p class="form-message" id="formMessage"></p>
+      </div>
+    </div>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">How it works</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h3>Talk to Petal like a friend</h3>
+              <p>Open the app and just chat. No templates, no prompts. Say how your day was.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h3>Petal remembers everything</h3>
+              <p>Names, dates, worries, joys — Petal keeps track so you don't have to.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h3>Get a weekly review that feels human</h3>
+              <p>Sunday morning. A warm recap of your week. Not data — just care.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">Meet your weekly review</h2>
+        <div class="review-card">
+          <div class="header">
+            <span class="petal-avatar-sm">
+              <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="65" r="38" fill="#f0f0f0" />
+                <circle cx="42" cy="40" r="22" fill="#f0f0f0" />
+                <circle cx="78" cy="40" r="22" fill="#f0f0f0" />
+                <circle cx="30" cy="60" r="18" fill="#f0f0f0" />
+                <circle cx="90" cy="60" r="18" fill="#f0f0f0" />
+                <circle cx="42" cy="88" r="20" fill="#f0f0f0" />
+                <circle cx="78" cy="88" r="20" fill="#f0f0f0" />
+                <circle cx="60" cy="95" r="18" fill="#f0f0f0" />
+                <circle cx="60" cy="65" r="36" fill="#f0f0f0" />
+                <ellipse cx="38" cy="70" rx="8" ry="5" fill="#ffd1dc" opacity="0.5" />
+                <ellipse cx="82" cy="70" rx="8" ry="5" fill="#ffd1dc" opacity="0.5" />
+                <circle cx="46" cy="58" r="5" fill="#2a2a2a" />
+                <circle cx="74" cy="58" r="5" fill="#2a2a2a" />
+              </svg>
+            </span>
+            <span class="name">Petal</span>
+          </div>
+          <div class="content">
+            "This week you mentioned <em>work stress</em> 3 times,<br />
+            but your <em>Tuesday dinner</em> made you really happy.<br /><br />
+            Weekend is calling. Take it easy 💕"
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="background: #fff">
+      <div class="container">
+        <h2 class="section-title">Why Petal?</h2>
+        <div class="features">
+          <div class="feature">
+            <div class="icon">💬</div>
+            <h3>Chat, don't type</h3>
+            <p>Talking to a friend is easier than writing in a diary.</p>
+          </div>
+          <div class="feature">
+            <div class="icon">🧠</div>
+            <h3>It actually remembers</h3>
+            <p>Petal knows what you said last week — and cares.</p>
+          </div>
+          <div class="feature">
+            <div class="icon">📊</div>
+            <h3>Weekly reviews</h3>
+            <p>A warm recap of your week. No data charts, just a friend checking in.</p>
+          </div>
+          <div class="feature">
+            <div class="icon">🔒</div>
+            <h3>Private by design</h3>
+            <p>Your conversations stay yours. End-to-end encrypted.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <h2 class="section-title">FAQ</h2>
+        <div class="faq-item">
+          <h3>What is Petal exactly?</h3>
+          <p>An AI companion you talk to like a friend. Every conversation is journaling. Petal remembers what matters and sends you a weekly life review.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How is this different from ChatGPT?</h3>
+          <p>ChatGPT has no persistent memory of you. Petal is built around one thing: knowing your story. It remembers names, events, emotions, and connects dots over time.</p>
+        </div>
+        <div class="faq-item">
+          <h3>How much will it cost?</h3>
+          <p>$6.99/month. Free trial included. The weekly review is the main paid feature.</p>
+        </div>
+        <div class="faq-item">
+          <h3>When will it launch?</h3>
+          <p>Beta in a few weeks. Join the waitlist and you'll be first in.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta">
+      <div class="container">
+        <div class="petal-avatar" style="width: 60px; height: 60px; margin: 0 auto 16px">
+          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="60" cy="65" r="38" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="42" cy="40" r="22" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="78" cy="40" r="22" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="30" cy="60" r="18" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="90" cy="60" r="18" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="42" cy="88" r="20" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="78" cy="88" r="20" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="60" cy="95" r="18" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <circle cx="60" cy="65" r="36" fill="url(#bodyGrad)" filter="url(#softEdge)" />
+            <ellipse cx="38" cy="70" rx="8" ry="5" fill="#ffd1dc" opacity="0.5" />
+            <ellipse cx="82" cy="70" rx="8" ry="5" fill="#ffd1dc" opacity="0.5" />
+            <circle cx="46" cy="58" r="5" fill="#2a2a2a" />
+            <circle cx="74" cy="58" r="5" fill="#2a2a2a" />
+          </svg>
+        </div>
+        <h2>Be the first to meet Petal</h2>
+        <form class="signup-form" id="signupForm2" action="https://api.web3forms.com/submit" method="POST" style="margin: 0 auto">
+          <input type="hidden" name="access_key" value="7d3a043c-a534-4a89-ad6d-d49a0f09c80d" />
+          <input type="hidden" name="subject" value="New Petal waitlist signup" />
+          <input type="email" name="email" placeholder="Your email" required />
+          <button type="submit">Get Early Access</button>
+        </form>
+        <p class="trust-note">No spam. Unsubscribe anytime.</p>
+        <p class="form-message" id="formMessage2"></p>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container">
+        <p>Made with care — <a href="https://twitter.com/HuntKevin45887" target="_blank">@HuntKevin45887</a></p>
+      </div>
+    </footer>
+
+    <script>
+      document.querySelectorAll(".signup-form").forEach((form) => {
+        form.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const btn = this.querySelector("button");
+          const msg = this.parentElement.querySelector(".form-message");
+          const email = this.querySelector('input[type="email"]');
+          msg.className = "form-message";
+
+          btn.textContent = "Submitting...";
+          btn.disabled = true;
+
+          try {
+            const res = await fetch(this.action, {
+              method: "POST",
+              body: new FormData(this),
+              headers: { Accept: "application/json" },
+            });
+            const data = await res.json();
+            if (data.success) {
+              msg.textContent = "You're on the list! We'll be in touch 🫧";
+              msg.className = "form-message success";
+              email.value = "";
+            } else {
+              msg.textContent = "Something went wrong. Try again?";
+              msg.className = "form-message error";
+            }
+          } catch {
+            msg.textContent = "Network error. Please try again.";
+            msg.className = "form-message error";
+          }
+
+          btn.textContent = "Get Early Access";
+          btn.disabled = false;
+        });
+      });
+    </script>
+  </body>
+</html>
